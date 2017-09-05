@@ -1,0 +1,235 @@
+default
+system "name goes here"
+{
+comment information goes here
+}
+method "main"
+begin
+    while starting a new session
+    begin
+      call "initialize";
+    end
+
+    Track Last Number record "hist count" data spins to record "historial" layout
+    add 1 to record "hist count" data
+    Track Last Number 72 spins to record "last 72" layout
+
+    if Any Inside Bet has Won each time
+    begin
+        set flag "bet" false
+    end
+
+    if flag "bet" false
+    begin
+       call "find_not_hitted"
+    end
+    else
+    begin
+       call "put bets"
+    end
+    add 1 to Record "spin count" data
+end
+
+method "initialize"
+begin
+    put 72 on record "track count" data;
+    put 0 to record "spin count" data
+    put 1 to record "spin bets" data
+    put 1 to record "track 5" data
+    put 1 to record "hist count" data
+    clear record "historial" layout
+    put 1 to record "historial" layout index
+    set flag "bet" to false
+    copy list [number 1, number 2, number 3, number 4, number 5, number 6,
+               number 7,
+               number 8, number 9, number 10,number 11,number 12,number 13,
+               number 14,number 15,number 16,number 17,number 18,number 19,
+               number 20,number 21,number 22,number 23,number 24,number 25,
+               number 26,number 27,number 28,number 29,number 30,number 31,
+               number 32,number 33,number 34,number 35,number 36,number 0,
+               number 00] to record "wheel" layout
+end
+
+method "find_not_hitted"
+begin
+     put 72 on record "track count" data;
+//     clear record "last 72" layout
+//     Track Last Number for record "track count" data spins to record "last 72" layout
+
+     set Flag "six or more" to false
+     if record "last 72" layout count >= record "track count" data
+     begin
+         put 1 to record "wheel" layout index
+         put 1 to record "last 72" layout index
+         clear record "not hitted" layout
+         put 1 to record "not hitted" layout index
+
+         loop until record "wheel" layout index > record "wheel" layout count
+         begin
+              //display "loop"
+              copy record "wheel" layout to record "actual number" layout
+              if Record "actual number" layout Not Found within Record "last 72" layout
+              begin
+                  //duplicate record "wheel" layout count to record "wheel count" data
+                  //duplicate record "wheel" layout index to record "wheel index" data
+
+
+                   copy record "wheel" layout to record "not hitted" layout
+                   add 1 to record "not hitted" layout index
+              end
+              add 1 to record "wheel" layout index
+         end
+         if Record "not hitted" layout count = 6
+         begin
+            set flag "bet" to true
+            put 1 to record "spin bets" data
+         end
+
+         // Mas de 6 numeros sin salir
+         if Record "not hitted" layout count > 6
+         begin
+            duplicate record "last 72" to record "temp balls"
+            loop until record "hitted count" data = 5 OR record "track count" data > record "historial" layout count
+            begin
+                 //Track Last Number for record "track count" data spins to record "last 72" layout
+                 if record "last 72" layout count >= record "track count" data
+                 begin
+                     put 1 to record "wheel" layout index
+                     //put 1 to record "last 72" layout index
+                     put 1 to record "not hitted" layout index
+                     set max record "historial" layout index
+                     subtract 100% record "track count" data to record "historial" layout index
+                     //subtract 1 to record "historial" layout index
+                     set max record "temp balls" layout index
+                     add 1 to record "temp balls" layout index
+                     copy record "historial" layout to record "temp balls" layout
+                     put 0 to record "hitted count" data
+
+                     if record "not hitted" layout count > 6
+                     begin
+                        clear record "not hitted" layout
+                     end
+
+                     loop until record "wheel" layout index > record "wheel" layout count
+                     begin
+                          //display "loop"
+                          //copy record "wheel" layout to record "actual number" layout
+                          if Record "wheel" layout Not Found within Record "temp balls" layout
+                          begin
+                              //duplicate record "wheel" layout count to record "wheel count" data
+                              //duplicate record "wheel" layout index to record "wheel index" data
+                               if record "not hitted" layout count < 6
+                               begin
+                                    copy record "wheel" layout to record "not hitted" layout
+                                    add 1 to record "not hitted" layout index
+                               end
+                               add 1 to record "hitted count" data
+                          end
+                          add 1 to record "wheel" layout index
+                     end
+                end
+                add 1 to record "track count" data
+            end
+            if Record "not hitted" layout count = 6
+            begin
+               set flag "bet" to true
+               put 1 to record "spin bets" data
+               duplicate record "track count"  to record "track 5"
+            end
+        end
+    end
+end
+
+method "put bets"
+begin
+    if record "not hitted" layout count = 6
+    begin
+       if record "spin bets" data < 6
+       begin
+          put 1 to record "not hitted" layout list
+       end
+       else
+       begin
+          if record "spin bets" data < 9
+          begin
+             put 2 to record "not hitted" layout list
+          end
+          else
+          begin
+             if record "spin bets" data < 11
+             begin
+                put 3 to record "not hitted" layout list
+             end
+          end
+       end
+       if record "spin bets" data = 11
+       begin
+          put 4 to record "not hitted" layout list
+       end
+       if record "spin bets" data = 12
+       begin
+          put 5 to record "not hitted" layout list
+       end
+
+       if record "spin bets" data = 13
+       begin
+          put 6 to record "not hitted" layout list
+       end
+
+       if record "spin bets" data = 14
+       begin
+          put 7 to record "not hitted" layout list
+       end
+
+       if record "spin bets" data = 15
+       begin
+          put 8 to record "not hitted" layout list
+       end
+       if record "spin bets" data  = 16
+       begin
+          put 10 to record "not hitted" layout list
+       end
+       if record "spin bets" data = 17
+       begin
+          put 12 to record "not hitted" layout list
+       end
+       if record "spin bets" data = 18
+       begin
+          put 14 to record "not hitted" layout list
+       end
+       if record "spin bets" data = 19
+       begin
+          put 17 to record "not hitted" layout list
+       end
+       if record "spin bets" data = 20
+       begin
+          put 21 to record "not hitted" layout list
+       end
+       if record "spin bets" data = 21
+       begin
+          put 25 to record "not hitted" layout list
+       end
+       if record "spin bets" data = 22
+       begin
+          put 30 to record "not hitted" layout list
+       end
+       if record "spin bets" data = 23
+       begin
+          put 36 to record "not hitted" layout list
+       end
+       if record "spin bets" data = 24
+       begin
+          put 43 to record "not hitted" layout list
+       end
+       if record "spin bets" data = 25
+       begin
+          put 52 to record "not hitted" layout list
+          set flag "bet" to false
+       end
+    end
+    else
+    begin
+       set flag "bet" to false
+    end
+    add 1 to record "spin bets" data
+end

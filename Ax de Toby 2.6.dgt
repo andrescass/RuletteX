@@ -1,0 +1,383 @@
+System "Ax de Toby 2.0"
+{
+  Segundo intento del sistema Ax de toby By JORDI!
+  
+  Sistema:
+
+  Analiza una seisena dentre de 4,5,6,7 u 8 bolas siguientes, si no sale dicha Linea, se cumplio un primer bloque
+  se realiza la misma accion pero esta vez con la ultima linea salida
+  si se cumplen 5 bloques consecutivos, comienza la apuesta, con el mismo procedimiento anterior
+  si se repitio comienza todo de 0
+  
+  Ejemplo de A4:     Eligo la Linea (1-6) osea Seisena 1!
+  
+  Bola          Seisena             Apuesta        Bloque
+  15               3                   -              1
+  12               2                   -              1
+  23               4                   -              1
+  32               6 (Nueva)           -              1            La seisena 1 no se repitio en todo el bloque 1
+                                                                   comienza de nuevo    Paso 1 Completado
+  19               4                   -              2
+  3                1                   -              2
+  9                2                   -              2
+  28               5 (Nueva)           -              2            La seisena 6 no se repitio en todo el bloque 2
+                                                                   comienza de nuevo    Paso 2 Completado
+  7                2                   -              3
+  20               4                   -              3
+  34               6                   -              3
+  2                1 (Nueva)           -              3            La seisena 5 no se repitio en todo el bloque 3
+                                                                   comienza de nuevo    Paso 3 Completado
+  12               5                   -              4
+  13               4                   -              4
+  28               6                   -              4
+  7                2 (Nueva)           -              4            La seisena 1 no se repitio en todo el bloque 4
+                                                                   comienza de nuevo    Paso 4 Completado
+  32               6                   -              5
+  3                1                   -              5
+  17               3                   -              5
+  20               4 (Apuesta!)        -              5            La seisena 2 no se repitio en todo el bloque 4
+                                                                   comienza de nuevo    Paso 5 Completado
+                                                                   
+  Comienza la progresion (voy a hacer de cuenta q sale en la ultima bola de la progresion)
+
+                                   Apostado         Ganado          Perdido     Neto
+  a la SEISENA 4
+
+  32                                   1              0                1          -1
+  32                                   1              0                1          -2
+  12                                   1              0                1          -3
+  4                                    1              0                1          -4
+  
+  a la SEISENA 1
+  
+  8                                    1              0                1          -5
+  17                                   2              0                2          -7
+  25                                   2              0                2          -9
+  14                                   2              0                2          -11
+  
+  a la SEISENA 3
+  
+  7                                    3              0                3          -14
+  35                                   3              0                3          -17
+  27                                   4              0                4          -21
+  5                                    5              0                5          -26
+  
+  a la Seisena 1
+  
+  12                                   6              0                5          -32
+  18                                   8              0                8          -40
+  3                                    10             60               10         +10
+  
+  Del mismo modo se realizan Analisis con Bloques de 5, de 6, de 7 y de 8 Bolas
+}
+Method "main"
+Begin
+    While Starting a New Session
+    Begin
+        Call "Initialize"
+        Call "Input"
+    End
+While on Each Spin
+    Begin
+        Call "LineaActual"
+        Call "Juego"
+    End
+End
+
+Method "LineaActual"
+begin
+    put 1 to record "Lineas" layout index
+    loop until record "Lineas" layout index > 6
+    begin
+        if record "Lineas" layout has hit each
+        begin
+            copy  record "Lineas" layout to record "LineaActual" layout
+        end
+        add 1 to record "Lineas" layout index
+    end
+    put 1 to record "Lineas" layout index
+    copy last number to record "UltimoNumero" layout
+    if record "UltimoNumero" layout = Number 0 or record "UltimoNumero" layout = Number 00
+    begin
+        copy record "UltimoNumero" layout to record "LineaActual" layout
+    end
+end
+
+//Sistemas Compuestos
+Method "Juego"
+begin
+    put 1 to record "LineaApostada" layout index
+    put 1 to record "Condiciones" data index
+    put 1 to record "Contadores" data index
+    put 1 to record "Progresiones" data index
+    put 1 to record "Retrasos" data index
+    put 1 to record "AtrasosAux" data index
+
+    put 1 to record "Pasar" data
+    loop until record "Pasar" data >5
+    begin
+    
+        if record "Pasar" data = 1 and flag "A4" is false
+        begin
+            add 1 to record "Pasar" data
+        end
+        
+        if record "Pasar" data = 2 and flag "A5" is false
+        begin
+            add 1 to record "Pasar" data
+        end
+        
+        if record "Pasar" data = 3 and flag "A6" is false
+        begin
+            add 1 to record "Pasar" data
+        end
+        
+        if record "Pasar" data = 4 and flag "A7" is false
+        begin
+            add 1 to record "Pasar" data
+        end
+        
+        if record "Pasar" data = 5 and flag "A8" is false
+        begin
+            add 1 to record "Pasar" data
+        end
+        
+        if record "Pasar" data < 6
+        begin
+
+            put 100% of record "Pasar" data to record "LineaApostada" layout index
+            put 100% of record "Pasar" data to record "Condiciones" data index
+            put 100% of record "Pasar" data to record "Contadores" data index
+            put 100% of record "Pasar" data to record "Progresiones" data index
+            put 100% of record "Pasar" data to record "NumerodeBloques" data index
+            put 100% of record "Pasar" data to record "CambioDeLinea" data index
+            put 100% of record "Pasar" data to record "Ax" data index
+            put 100% of record "Pasar" data to record "Maximos" data index
+            put 100% of record "Pasar" data to record "Retrasos" data index
+            put 100% of record "Pasar" data to record "AtrasosAux" data index
+
+            if record "LineaActual" layout Not= to record "LineaApostada" layout
+            begin
+                add 1 to record "Retrasos" data // si no acerté sumo al contador de retraso
+                if record "Condiciones" data < record "NumerodeBloques" data
+                begin
+                    if record "Contadores" data < record "Ax" data
+                    begin
+                        add 1 to record "Contadores" data
+                        if record "Contadores" data = record "Ax" data
+                        begin
+                            add 1 to record "Condiciones" data
+
+                            put 1 to record "Lineas" layout index
+                            loop until record "Lineas" layout index >6
+                            begin
+                                if record "Lineas" layout has hit each
+                                begin
+                                    copy record "Lineas" layout to record "LineaApostada" layout
+                                end
+                                add 1 to record "Lineas" layout index
+                            end
+                            put 1 to record "Lineas" layout index
+
+                            put 0 to record "Contadores" data
+                        end
+                    end
+                    if record "Condiciones" data = record "NumerodeBloques" data
+                    begin
+                        add 1 to record "Progresiones" data
+                        put 100% of record "Progresiones" data to record "Progresion" data index
+                        multiply 100% record "Progresion" data to record "FichaTemp" data
+                        put 100% of record "FichaTemp" data to record "LineaApostada" layout
+                        put 100% of record "Ficha" data to record "FichaTemp" data
+                        put 1 to record "AtrasosAux" data // empece a apostar
+                    end
+                end
+                else
+                begin
+                    if record "CambioDeLinea" data = record "Ax" data
+                    begin
+                        put 1 to record "Lineas" layout index
+                            loop until record "Lineas" layout index >6
+                            begin
+                                if record "Lineas" layout has hit each
+                                begin
+                                    copy record "Lineas" layout to record "LineaApostada" layout
+                                end
+                                add 1 to record "Lineas" layout index
+                            end
+                        put 1 to record "Lineas" layout index
+                        put 0 to record "CambioDeLinea" data
+                    end
+                    add 1 to record "Progresiones" data
+                    if record "Progresiones" data > record "Maximos" data
+                    begin
+                        put 100% of record "Progresiones" data to record "Maximos" data
+                    end
+                    put 100% of record "Progresiones" data to record "Progresion" data index
+                    multiply 100% record "Progresion" data to record "FichaTemp" data
+                    put 100% of record "FichaTemp" data to record "LineaApostada" layout
+                    put 100% of record "Ficha" data to record "FichaTemp" data
+                    add 1 to record "CambioDeLinea" data
+                    put 1 to record "AtrasosAux" data // empece a apostar
+                end
+
+            end
+            else
+            begin
+                put 0 to record "Condiciones" data
+                put 0 to record "Contadores" data
+                put 0 to record "Progresiones" data
+                put 0 to record "CambiodeLinea" data
+                
+                if record "AtrasosAux" data < 1 // Si aun no empece a apostar no gané
+                begin
+                    add 1 to record "Retrasos" data // aumento el contador de retraso
+                end
+            end
+    
+        end
+    add 1 to record "Pasar" data
+    end
+end
+
+
+//routine to initialize the system
+Method "Initialize"
+Begin
+
+    Copy list [Line(1-6),Line(7-12),Line(13-18),Line(19-24),Line(25-30),Line(31-36)] to record "Lineas" layout
+
+    //Cuenta las condiciones q van cumpliendose
+    Set list [0,0,0,0,0] to record "Condiciones" data
+    Set list [0,0,0,0,0] to record "Contadores" data
+    Set list [0,0,0,0,0] to record "Progresiones" data
+    
+
+    Set list [4,5,6,7,8] to record "Ax" data
+    Set list [1,1,1,1,1] to record "CambioDeLinea" data
+    
+    //Flags
+    set flag "ApuestaA4" to false
+    set flag "ApuestaA5" to false
+    set flag "ApuestaA6" to false
+    set flag "ApuestaA7" to false
+    set flag "ApuestaA8" to false
+    
+    // Retrasos maximos
+    set list [0,0,0,0,0] to record "Retrasos" data
+    
+    // Retrasos auxiliares
+    set list [0,0,0,0,0] to record "AtrasoAux" data
+
+
+
+
+    
+End
+//routine to ask for any data inputs
+Method "Input"
+Begin
+    Group
+    begin
+        Display "Sistema Ax de Toby. A que deseas jugar:"
+        Input Checkbox "A4:             " to Flag "A4"
+        Input Checkbox "A5:             " to Flag "A5"
+        Input Checkbox "A6:             " to Flag "A6"
+        Input Checkbox "A7:             " to Flag "A7"
+        Input Checkbox "A8:             " to Flag "A8"
+        Input Checkbox "Todas:             " to Flag "AX"
+        Display " "
+        Input DropDown "Elige seisena ficticia:
+            1:= 1-6
+            2:= 7-12
+            3:= 13-18
+            4:= 19-24
+            5:= 25-30
+            6:= 31-36" to record "PrimeraTemp" data
+        Display " "
+        Input Data "Caja:       "   to Bankroll
+        Input Data "Ficha:      " to record "Ficha" data
+        Display " "
+        Input DropDown "Tipo de Progresion:
+            1:= Toby
+            2:= Jordi
+            3:= Rokero
+            4:= Ninguna" to record "Tipo de Progresion" data
+    end
+    put 1 to record "LineaApostada" layout index
+    loop until record "LineaApostada" layout index >5
+    begin
+        put 100% of record "PrimeraTemp" data to record "Lineas" layout index
+        copy Record "Lineas" layout to record "LineaApostada" layout
+        add 1 to record "LineaApostada" layout index
+    end
+    put 1 to record "LineaApostada" layout index
+    if Flag "AX" is true
+    begin
+        set flag "A4" to true
+        set flag "A5" to true
+        set flag "A6" to true
+        set flag "A7" to true
+        set flag "A8" to true
+    end
+    group
+    begin
+        display "Numeros de Bloques"
+        display "Si elegis default se ponene los q estan entre parentesis"
+        display "Si queres cambiarlos, quita el default y ponle valores a todos(Si, a todos)"
+        display " "
+        input data "A4:(9)         " to record "BA4" data
+        input data "A5:(8)         " to record "BA5" data
+        input data "A6:(7)         " to record "BA6" data
+        input data "A7:(6)         " to record "BA7" data
+        input data "A8:(5)         " to record "BA8" data
+        display " "
+        input checkbox "Default" to flag "Default"
+    end
+    if flag "Default" is true
+    begin
+        Set list [9,9,7,6,5] to record "NumerodeBloques" data
+    end
+    if flag "Default" is false
+    begin
+        put 1 to record "NumerodeBloques" data index
+        put 100% of record "BA4" data to record "NumerodeBloques" data
+        put 2 to record "NumerodeBloques" data index
+        put 100% of record "BA5" data to record "NumerodeBloques" data
+        put 3 to record "NumerodeBloques" data index
+        put 100% of record "BA6" data to record "NumerodeBloques" data
+        put 4 to record "NumerodeBloques" data index
+        put 100% of record "BA7" data to record "NumerodeBloques" data
+        put 5 to record "NumerodeBloques" data index
+        put 100% of record "BA8" data to record "NumerodeBloques" data
+    end
+    if record "Tipo de Progresion" data = 1
+    begin
+        Set list [1,1,1,1,1,2,2,2,3,3,4,5,6,8,10,1,1,1,1,1,2,2,2,3,3,4,5,6,8,10,1,1,1,1,1,2,2,2,3,3,4,5,6,8,10] to record "Progresion" data
+    end
+    else
+    begin
+        if record "Tipo de Progresion" data = 2
+        begin
+            Set list [1,1,1,1,1,2,2,2,3,3,4,5,6,7,8,10,12,14,17,21,25,30,36,43,52,
+                  62,74,89,107,128,154,185,222,266,320,384,461,552,663,796,955] to record "Progresion" data
+        end
+        else
+        begin
+            if record "Tipo de progresion" data = 3
+            begin
+                set list [1,1,1,1,1,2,2,2,2,2,3,3,3,3,3,4,4,4,4,4,5,5,5,5,5,6,6,6,6,6,7,7,7,7,7,8,8,8,8,8,9,9,9,9,9] to record "Progresion" data
+            end
+            else
+            begin
+                Set list [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+                      0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+                      0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+                      0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+                      100] to record "Progresion" data
+            end
+        end
+    end
+
+    Put 100% record "Ficha" data to record "FichaTemp" data
+End
